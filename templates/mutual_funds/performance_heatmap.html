@@ -1,0 +1,145 @@
+{% extends 'mutual_funds/base.html' %}
+
+{% block content %}
+<style>
+/* General Page Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fffaf0, #f8f8f8);
+    color: #333;
+    text-align: center;
+}
+
+/* Larger Container */
+.container {
+    max-width: 750px;  /* Increased width */
+    margin: 60px auto;  /* More margin */
+    background: #ffffff;
+    padding: 40px;  /* More padding */
+    border-radius: 12px;
+    box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.12);
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Heading */
+h2 {
+    color: #222;
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+/* Form Styling */
+form {
+    margin: 25px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Label */
+label {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+/* Larger Select Box */
+select {
+    width: 85%;  /* Increased width */
+    max-width: 500px;  /* Larger max-width */
+    padding: 14px;  /* More padding */
+    border-radius: 8px;
+    border: 1.5px solid #ccc;
+    font-size: 18px;  /* Bigger font */
+    background: #fff;
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+}
+
+select:hover {
+    background: #ffeb99;
+}
+
+/* Bigger Button */
+button {
+    padding: 14px 30px;
+    border: none;
+    background: #ffcc00;
+    color: black;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-top: 20px;
+    transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+    background: #ffaa00;
+    transform: scale(1.08);
+}
+
+/* Selected Scheme */
+h3 {
+    color: #333;
+    font-size: 22px;
+    margin-top: 20px;
+}
+
+/* Heatmap Image Styling */
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 25px auto;
+    border-radius: 12px;
+    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease-in-out;
+}
+
+img:hover {
+    transform: scale(1.06);
+}
+
+/* Error Message */
+p {
+    font-size: 18px;
+    color: #d9534f;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<div class="container">
+    <h2>🔥 Performance Heatmap</h2>
+
+    <form method="GET" action="{% url 'performance_heatmap' %}">
+        <label for="scheme">📊 Select a Scheme:</label>
+        <select name="scheme" id="scheme">
+            <option value="">-- Select Scheme --</option>
+            {% for scheme in scheme_list %}
+                <option value="{{ scheme.code }}" {% if scheme.code == request.GET.scheme %}selected{% endif %}>{{ scheme.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">🚀 Show Heatmap</button>
+    </form>
+
+    {% if selected_scheme_name %}
+        <h3>📌 Selected Scheme: {{ selected_scheme_name }}</h3>
+    {% endif %}
+
+    {% if heatmap_url %}
+        <h3>📈 Performance Heatmap</h3>
+        <img src="{{ heatmap_url }}" alt="Performance Heatmap">
+    {% endif %}
+
+    {% if error %}
+        <p>⚠️ {{ error }}</p>
+    {% endif %}
+</div>
+
+{% endblock %}

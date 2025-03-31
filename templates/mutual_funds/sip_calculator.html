@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 Systematic Investment Plan (SIP) Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: #0f172a;
+            color: #00ffcc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px #00ffcc;
+            width: 50%;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .slider-container {
+            margin: 8px 0;
+        }
+
+        input[type="range"] {
+            width: 90%;
+            accent-color: #00ffcc;
+        }
+
+        button {
+            background: transparent;
+            border: 2px solid #00ffcc;
+            padding: 8px 12px;
+            color: #00ffcc;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s ease-in-out;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #00ffcc;
+            color: #0f172a;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+
+        .chart-container {
+            width: 90%;
+            max-width: 600px;
+            height: 300px;
+            margin: 10px auto;
+            padding: 10px;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            border-radius: 8px;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📈 Systematic Investment Plan (SIP) Calculator</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Monthly Investment Slider -->
+            <div class="slider-container">
+                <label>Monthly Investment: ₹<span id="monthly_display">{{ monthly_investment }}</span></label><br>
+                <input type="range" name="monthly_investment" min="100" max="100000" step="100" value="{{ monthly_investment }}"
+                       oninput="updateValue('monthly_display', this.value)">
+            </div>
+
+            <!-- Annual Interest Rate Slider -->
+            <div class="slider-container">
+                <label>Annual Interest Rate: <span id="rate_display">{{ annual_rate }}</span>%</label><br>
+                <input type="range" name="annual_rate" min="1" max="20" step="0.1" value="{{ annual_rate }}"
+                       oninput="updateValue('rate_display', this.value)">
+            </div>
+
+            <!-- Investment Duration Slider -->
+            <div class="slider-container">
+                <label>Investment Duration: <span id="years_display">{{ years }}</span> years</label><br>
+                <input type="range" name="years" min="1" max="50" step="1" value="{{ years }}"
+                       oninput="updateValue('years_display', this.value)">
+            </div>
+
+            <button type="submit">📊 Calculate SIP</button>
+        </form>
+
+        {% if future_value is not None %}
+            <h3>✅ Future Value: ₹<strong>{{ future_value }}</strong></h3>
+
+            <!-- Growth Chart -->
+            <div class="chart-container">
+                <canvas id="sipChart"></canvas>
+            </div>
+
+            <script>
+                const years = [...Array({{ years }} + 1).keys()];
+                const monthlyInvestment = {{ monthly_investment }};
+                const annualRate = {{ annual_rate }};
+                const r = (annualRate / 100) / 12;
+
+                // Calculate SIP growth over years
+                let sipValues = [0];
+                let totalInvestment = 0;
+                for (let y = 1; y <= {{ years }}; y++) {
+                    let futureValue = 0;
+                    for (let m = 1; m <= 12; m++) {
+                        futureValue += monthlyInvestment * ((1 + r) ** ((y - 1) * 12 + m));
+                    }
+                    totalInvestment += monthlyInvestment * 12;
+                    sipValues.push(futureValue);
+                }
+
+                const ctx = document.getElementById('sipChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: years,
+                        datasets: [{
+                            label: 'SIP Growth Over Time',
+                            data: sipValues,
+                            borderColor: 'green',
+                            borderWidth: 2,
+                            fill: true,
+                            backgroundColor: 'rgba(0, 255, 0, 0.2)',
+                            tension: 0.3 // Smoother curve
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { title: { display: true, text: 'Years' } },
+                            y: { title: { display: true, text: 'Investment Value (₹)' }, beginAtZero: true }
+                        }
+                    }
+                });
+            </script>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        /* Full-screen background with a glass effect */
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            background: url('https://wallpaperaccess.com/full/665335.jpg') no-repeat center center/cover;
+            backdrop-filter: blur(10px); /* Glass effect on background */
+            overflow: hidden;
+        }
+
+        /* Glassmorphism Effect */
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0px 15px 25px rgba(0, 170, 255, 0.3);
+            text-align: center;
+            width: 420px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeIn 1s ease-in-out, floatUp 3s infinite alternate;
+        }
+
+        /* Smooth fade-in effect */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Floating animation */
+        @keyframes floatUp {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+
+        /* Heading with glow effect */
+        h2 {
+            color: #fff;
+            font-size: 26px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+            text-shadow: 0px 0px 10px rgba(0, 170, 255, 0.8);
+        }
+
+        /* Form labels */
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 10px 0 5px;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        /* Input fields */
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px; /* Added space between input fields */
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            outline: none;
+            transition: 0.3s;
+            box-shadow: 0px 5px 10px rgba(255, 255, 255, 0.1);
+        }
+
+        /* White Placeholder Text */
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Input focus effect */
+        input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0px 0px 15px rgba(0, 170, 255, 0.8);
+        }
+
+        /* Submit button */
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px; /* Space added above the button */
+            background: linear-gradient(to right, #00aaff, #1e90ff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0px 8px 15px rgba(0, 170, 255, 0.4);
+            transform: perspective(500px) rotateX(0deg);
+        }
+
+        /* 3D button hover effect */
+        button:hover {
+            background: linear-gradient(to right, #1e90ff, #00aaff);
+            transform: perspective(500px) rotateX(10deg);
+        }
+
+        /* Link styles */
+        p {
+            margin-top: 15px;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        a {
+            color: #00aaff;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #1e90ff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Sign Up</h2>
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>Username:</label>
+            <input type="text" name="username" placeholder="Enter your username" required>
+
+            <label>Email:</label>
+            <input type="email" name="email" placeholder="Enter your email" required>
+
+            <label>Password:</label>
+            <input type="password" name="password1" placeholder="Create a password" required>
+
+            <label>Confirm Password:</label>
+            <input type="password" name="password2" placeholder="Confirm your password" required>
+
+            <button type="submit">Sign Up</button>
+        </form>
+
+        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+    </div>
+
+</body>
+</html>

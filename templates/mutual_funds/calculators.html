@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Calculators</title>
+    <style>
+        /* Full-page background with a soft gradient */
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #f7f7f7, #f0f0f0);
+        }
+
+        /* Centered Dashboard Container */
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Smooth fade-in effect */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Heading */
+        h2 {
+            color: #333;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Subtext */
+        p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Navigation links */
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-links a {
+            display: block;
+            text-decoration: none;
+            background: linear-gradient(to right, #ffd700, #ffecb3);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #000000;
+            transition: all 0.3s ease-in-out;
+            text-align: center;
+            box-shadow: 0px 5px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Button Hover Effect */
+        .nav-links a:hover {
+            background: linear-gradient(to right, #ffecb3, #ffd700);
+            transform: scale(1.05);
+        }
+
+        /* Logout Button */
+        .nav-links .logout {
+            background: linear-gradient(to right, #ff6b6b, #ff4757);
+            box-shadow: 0px 5px 8px rgba(255, 107, 107, 0.3);
+            color: white;
+        }
+
+        .nav-links .logout:hover {
+            background: linear-gradient(to right, #ff4757, #ff6b6b);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📊 Financial Calculators</h2>
+        <p>Choose a calculator to get started:</p>
+
+        <div class="nav-links">
+            <a href="{% url 'cagr_calculator' %}">CAGR Calculator</a>
+            <a href="{% url 'roi_calculator' %}">ROI Calculator</a>
+            <a href="{% url 'stock_calculator' %}">Stock Profit Calculator</a>
+            <a href="{% url 'sip_calculator' %}">SIP Calculator</a>
+            <a href="{% url 'sip_annual_increase' %}">SIP Annual Increase Calculator</a>
+            <a href="{% url 'ppf_calculator' %}">PPF Calculator</a>
+            <a href="{% url 'retirement_calculator' %}">Retirement Calculator</a>
+            <a href="{% url 'home_loan_emi_calculator' %}">Home Loan EMI Calculator</a>
+            <a href="{% url 'compounding_calculator' %}">Compounding Calculator</a>
+            <a href="{% url 'fd_calculator' %}">FD Calculator</a>
+            <a href="{% url 'lumpsum_calculator' %}">Lumpsum Calculator</a>
+            <a href="{% url 'tax_saving_calculator' %}">Tax Saving Calculator</a>
+            <a href="{% url 'logout' %}" class="logout">Logout</a>
+        </div>
+    </div>
+</body>
+</html>

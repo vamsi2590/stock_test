@@ -1,0 +1,100 @@
+{% extends 'mutual_funds/base.html' %}
+
+{% block content %}
+<style>
+/* General Page Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fffaf0, #f8f8f8);
+    color: #333;
+}
+
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Heading */
+h2 {
+    text-align: center;
+    color: #222;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    transition: all 0.3s ease-in-out;
+}
+
+th {
+    background-color: #ffcc00;
+    color: black;
+}
+
+td {
+    background-color: #fff;
+}
+
+tr:hover {
+    background-color: #fff5cc;
+    transform: scale(1.02);
+}
+
+/* Error Message */
+p {
+    text-align: center;
+    font-size: 16px;
+    color: #d9534f;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<div class="container">
+    <h2>📊 Average AUM Analysis</h2>
+
+    {% if aum_list %}
+        <table>
+            <thead>
+                <tr>
+                    <th>🏦 Fund Name</th>
+                    <th>💰 Total AUM</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fund in aum_list %}
+                <tr>
+                    <td>{{ fund.fund_name }}</td>
+                    <td>{{ fund.total_aum }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>⚠️ No AUM data available.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

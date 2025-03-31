@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 Return on Investment (ROI) Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: #0f172a;
+            color: #00ffcc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px #00ffcc;
+            width: 50%;
+        }
+
+        .slider-container {
+            margin: 8px 0;
+        }
+
+        input[type="range"] {
+            width: 90%;
+            accent-color: #00ffcc;
+        }
+
+        button {
+            background: transparent;
+            border: 2px solid #00ffcc;
+            padding: 8px 12px;
+            color: #00ffcc;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s ease-in-out;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #00ffcc;
+            color: #0f172a;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+
+        .chart-container {
+            width: 90%;
+            max-width: 600px;
+            height: 300px;
+            margin: 10px auto;
+            padding: 10px;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            border-radius: 8px;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>💰 Return on Investment (ROI) Calculator</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Initial Investment -->
+            <div class="slider-container">
+                <label>Initial Investment: ₹<span id="initial_value_display">{{ initial_value }}</span></label><br>
+                <input type="range" name="initial_value" min="100" max="1000000" step="100" value="{{ initial_value }}"
+                       oninput="updateValue('initial_value_display', this.value)">
+            </div>
+
+            <!-- Final Investment -->
+            <div class="slider-container">
+                <label>Final Investment Value: ₹<span id="final_value_display">{{ final_value }}</span></label><br>
+                <input type="range" name="final_value" min="1000" max="10000000" step="1000" value="{{ final_value }}"
+                       oninput="updateValue('final_value_display', this.value)">
+            </div>
+
+            <button type="submit">📊 Calculate ROI</button>
+        </form>
+
+        {% if result is not None %}
+            <h3>✅ ROI: <strong>{{ result }}%</strong></h3>
+
+            <!-- ROI Growth Chart -->
+            <div class="chart-container">
+                <canvas id="roiChart"></canvas>
+            </div>
+
+            <script>
+                const investments = [{{ initial_value }}, {{ final_value }}];
+                const labels = ["Initial Investment", "Final Investment"];
+
+                const ctx = document.getElementById('roiChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Investment Value',
+                            data: investments,
+                            backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(75, 192, 192, 0.6)'],
+                            borderColor: ['rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)'],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Investment Value (₹)', color: '#00ffcc', font: { size: 12 } },
+                                grid: { color: 'rgba(0, 255, 204, 0.1)' }
+                            },
+                            x: {
+                                title: { display: true, text: 'Investment', color: '#00ffcc', font: { size: 12 } },
+                                grid: { color: 'rgba(0, 255, 204, 0.1)' }
+                            }
+                        }
+                    }
+                });
+            </script>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏦 FD Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: #0f172a;
+            color: #00ffcc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px #00ffcc;
+            width: 50%;
+        }
+        .slider-container {
+            margin: 8px 0;
+        }
+        input[type="range"] {
+            width: 90%;
+            accent-color: #00ffcc;
+        }
+        select {
+            width: 92%;
+            padding: 8px;
+            font-size: 14px;
+            background: rgba(0, 255, 204, 0.1);
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+            border-radius: 5px;
+            outline: none;
+        }
+        button {
+            background: transparent;
+            border: 2px solid #00ffcc;
+            padding: 8px 12px;
+            color: #00ffcc;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s ease-in-out;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background: #00ffcc;
+            color: #0f172a;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+        .chart-container {
+            width: 90%;
+            max-width: 600px;
+            height: 300px;
+            margin: 10px auto;
+            padding: 10px;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            border-radius: 8px;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🏦 Fixed Deposit (FD) Calculator</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="slider-container">
+                <label>Principal Amount: ₹<span id="principal_display">{{ principal|default:100000 }}</span></label><br>
+                <input type="range" name="principal" min="10000" max="10000000" step="5000" value="{{ principal|default:100000 }}"
+                       oninput="updateValue('principal_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Annual Interest Rate: <span id="rate_display">{{ rate|default:7 }}</span>%</label><br>
+                <input type="range" name="rate" min="1" max="15" step="0.1" value="{{ rate|default:7 }}"
+                       oninput="updateValue('rate_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Investment Duration: <span id="years_display">{{ years|default:5 }}</span> years</label><br>
+                <input type="range" name="years" min="1" max="30" step="1" value="{{ years|default:5 }}"
+                       oninput="updateValue('years_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Compounding Frequency:</label><br>
+                <select name="compounding">
+                    <option value="1" {% if compounding == 1 %}selected{% endif %}>Annually</option>
+                    <option value="2" {% if compounding == 2 %}selected{% endif %}>Semi-Annually</option>
+                    <option value="4" {% if compounding == 4 %}selected{% endif %}>Quarterly</option>
+                    <option value="12" {% if compounding == 12 %}selected{% endif %}>Monthly</option>
+                </select>
+            </div>
+
+            <button type="submit">📊 Calculate FD</button>
+        </form>
+
+        {% if future_value is not None %}
+            <h3>✅ Future Value: ₹<strong>{{ future_value }}</strong></h3>
+
+            <div class="chart-container">
+                <canvas id="fdChart"></canvas>
+            </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var ctx = document.getElementById("fdChart").getContext("2d");
+
+                    // Using data from Django context
+                    var years = {{ years | safe }};
+                    var investmentValues = {{ y_values | safe }};
+
+                    if (years.length === 0 || investmentValues.length === 0) {
+                        console.error("FD Calculator: No data available for graph.");
+                        return;
+                    }
+
+                    new Chart(ctx, {
+                        type: "line",
+                        data: {
+                            labels: years,
+                            datasets: [{
+                                label: "FD Growth Over Time",
+                                data: investmentValues,
+                                borderColor: "#00ffcc",
+                                backgroundColor: "rgba(0, 255, 204, 0.2)",
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointBackgroundColor: "#00ffcc",
+                                hoverRadius: 5,
+                                hoverBackgroundColor: "#ffcc00"
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                x: {
+                                    title: { display: true, text: "Years", color: "#00ffcc", font: { size: 12 } },
+                                    grid: { color: "rgba(0, 255, 204, 0.1)" }
+                                },
+                                y: {
+                                    title: { display: true, text: "Investment Value (₹)", color: "#00ffcc", font: { size: 12 } },
+                                    grid: { color: "rgba(0, 255, 204, 0.1)" }
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+        {% endif %}
+    </div>
+</body>
+</html>

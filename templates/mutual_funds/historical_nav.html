@@ -1,0 +1,146 @@
+{% extends 'mutual_funds/base.html' %}
+
+{% block content %}
+<style>
+/* General Page Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fffaf0, #f8f8f8);
+    color: #333;
+}
+
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Heading */
+h2, h3 {
+    text-align: center;
+    color: #222;
+}
+
+/* Form Styling */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+select:focus {
+    border-color: #ffcc00;
+    outline: none;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.4);
+}
+
+button {
+    background: linear-gradient(to right, #ffcc00, #ffb700);
+    color: black;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to right, #ffb700, #ff9900);
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #ffcc00;
+    color: black;
+}
+
+td {
+    background-color: #fff;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<div class="container">
+    <h2>📊 Historical NAV Data</h2>
+
+    <!-- Scheme Selection Form -->
+    <form method="GET">
+        <label>Select Scheme:</label>
+        <select name="scheme_code">
+            {% for code, name in schemes.items %}
+            <option value="{{ code }}" {% if selected_scheme == code %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Get NAV</button>
+    </form>
+
+    <!-- Display NAV Data -->
+    {% if nav_data %}
+        <h3>🏦 Fund Details</h3>
+        <p><strong>Fund House:</strong> {{ nav_data.fund_house }}</p>
+        <p><strong>Scheme Type:</strong> {{ nav_data.scheme_type }}</p>
+        <p><strong>Scheme Category:</strong> {{ nav_data.scheme_category }}</p>
+        <p><strong>Scheme Code:</strong> {{ nav_data.scheme_code }}</p>
+        <p><strong>Scheme Name:</strong> {{ nav_data.scheme_name }}</p>
+        <p><strong>Start Date:</strong> {{ nav_data.scheme_start_date.date }}</p>
+
+        <h3>📅 NAV History</h3>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>NAV</th>
+            </tr>
+            {% for record in nav_data.data %}
+            <tr>
+                <td>{{ record.date }}</td>
+                <td>{{ record.nav }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No NAV data available. Please select a scheme.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

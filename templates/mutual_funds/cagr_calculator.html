@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 CAGR Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: #0f172a;
+            color: #00ffcc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px #00ffcc;
+            width: 50%;
+        }
+        .slider-container {
+            margin: 8px 0;
+        }
+        input[type="range"] {
+            width: 90%;
+            accent-color: #00ffcc;
+        }
+        button {
+            background: transparent;
+            border: 2px solid #00ffcc;
+            padding: 8px 12px;
+            color: #00ffcc;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s ease-in-out;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background: #00ffcc;
+            color: #0f172a;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+        .chart-container {
+            width: 90%;
+            max-width: 600px;
+            height: 300px;
+            margin: 10px auto;
+            padding: 10px;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            border-radius: 8px;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📈 Compound Annual Growth Rate (CAGR) Calculator</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="slider-container">
+                <label>Initial Investment: ₹<span id="initial_value_display">{{ initial_value }}</span></label><br>
+                <input type="range" name="initial_value" min="100" max="1000000" step="100" value="{{ initial_value }}"
+                       oninput="updateValue('initial_value_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Final Investment: ₹<span id="final_value_display">{{ final_value }}</span></label><br>
+                <input type="range" name="final_value" min="1000" max="10000000" step="1000" value="{{ final_value }}"
+                       oninput="updateValue('final_value_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Number of Years: <span id="years_display">{{ years }}</span> years</label><br>
+                <input type="range" name="years" min="1" max="50" step="1" value="{{ years }}"
+                       oninput="updateValue('years_display', this.value)">
+            </div>
+
+            <button type="submit">📊 Calculate CAGR</button>
+        </form>
+
+        {% if result is not None %}
+            <h3>✅ CAGR: <strong>{{ result }}%</strong></h3>
+            <div class="chart-container">
+                <canvas id="cagrChart"></canvas>
+            </div>
+
+            <script>
+                const years = Array.from({ length: {{ years }} + 1 }, (_, i) => i);
+                const initialInvestment = {{ initial_value }};
+                const cagr = {{ result }} / 100;
+                const investmentValues = years.map(y => initialInvestment * Math.pow(1 + cagr, y));
+
+                const ctx = document.getElementById('cagrChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: years,
+                        datasets: [{
+                            label: 'Investment Growth',
+                            data: investmentValues,
+                            borderColor: '#00ffcc',
+                            backgroundColor: 'rgba(0, 255, 204, 0.2)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#00ffcc',
+                            hoverRadius: 5,
+                            hoverBackgroundColor: '#ffcc00'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Years', color: '#00ffcc', font: { size: 12 } },
+                                grid: { color: 'rgba(0, 255, 204, 0.1)' }
+                            },
+                            y: {
+                                title: { display: true, text: 'Investment Value (₹)', color: '#00ffcc', font: { size: 12 } },
+                                grid: { color: 'rgba(0, 255, 204, 0.1)' }
+                            }
+                        }
+                    }
+                });
+            </script>
+        {% endif %}
+    </div>
+</body>
+</html>

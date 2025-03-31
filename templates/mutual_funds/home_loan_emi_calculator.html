@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏡 Home Loan EMI Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: #0f172a;
+            color: #00ffcc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px #00ffcc;
+            width: 50%;
+        }
+        .slider-container {
+            margin: 8px 0;
+        }
+        input[type="range"] {
+            width: 90%;
+            accent-color: #00ffcc;
+        }
+        select {
+            width: 92%;
+            padding: 8px;
+            font-size: 14px;
+            background: rgba(0, 255, 204, 0.1);
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+            border-radius: 5px;
+            outline: none;
+        }
+        button {
+            background: transparent;
+            border: 2px solid #00ffcc;
+            padding: 8px 12px;
+            color: #00ffcc;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s ease-in-out;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background: #00ffcc;
+            color: #0f172a;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+        .chart-container {
+            width: 90%;
+            max-width: 600px;
+            height: 300px;
+            margin: 10px auto;
+            padding: 10px;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            border-radius: 8px;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🏡 Home Loan EMI Calculator</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="slider-container">
+                <label>Loan Amount: ₹<span id="loan_amount_display">{{ loan_amount|default:1000000 }}</span></label><br>
+                <input type="range" name="loan_amount" min="100000" max="100000000" step="100000" value="{{ loan_amount|default:1000000 }}"
+                       oninput="updateValue('loan_amount_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Annual Interest Rate: <span id="annual_rate_display">{{ annual_rate|default:7 }}</span>%</label><br>
+                <input type="range" name="annual_rate" min="1" max="20" step="0.1" value="{{ annual_rate|default:7 }}"
+                       oninput="updateValue('annual_rate_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Loan Tenure: <span id="tenure_years_display">{{ tenure_years|default:20 }}</span> years</label><br>
+                <input type="range" name="tenure_years" min="1" max="40" step="1" value="{{ tenure_years|default:20 }}"
+                       oninput="updateValue('tenure_years_display', this.value)">
+            </div>
+
+            <button type="submit">📊 Calculate EMI</button>
+        </form>
+
+        {% if emi is not None %}
+            <h3>✅ EMI: ₹<strong>{{ emi }}</strong></h3>
+            <h4>💰 Total Payment: ₹{{ total_payment }}</h4>
+            <h4>📉 Total Interest Paid: ₹{{ total_interest }}</h4>
+
+            <div class="chart-container">
+                <canvas id="emiChart"></canvas>
+            </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var ctx = document.getElementById("emiChart").getContext("2d");
+
+                    // Loan repayment timeline
+                    var tenureMonths = {{ tenure_years }} * 12;
+                    var emiChartData = {{ emi_chart|safe }};
+
+                    if (tenureMonths <= 0 || emiChartData.length === 0) {
+                        console.error("EMI Calculator: No data available for graph.");
+                        return;
+                    }
+
+                    new Chart(ctx, {
+                        type: "line",
+                        data: {
+                            labels: Array.from({ length: tenureMonths }, (_, i) => i + 1),
+                            datasets: [{
+                                label: "Loan Repayment Progress",
+                                data: emiChartData,
+                                borderColor: "#00ffcc",
+                                backgroundColor: "rgba(0, 255, 204, 0.2)",
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointBackgroundColor: "#00ffcc",
+                                hoverRadius: 5,
+                                hoverBackgroundColor: "#ffcc00"
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                x: {
+                                    title: { display: true, text: "Months", color: "#00ffcc", font: { size: 12 } },
+                                    grid: { color: "rgba(0, 255, 204, 0.1)" }
+                                },
+                                y: {
+                                    title: { display: true, text: "Remaining Balance (₹)", color: "#00ffcc", font: { size: 12 } },
+                                    grid: { color: "rgba(0, 255, 204, 0.1)" }
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+        {% endif %}
+    </div>
+</body>
+</html>

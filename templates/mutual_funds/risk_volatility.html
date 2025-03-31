@@ -1,0 +1,146 @@
+{% extends 'mutual_funds/base.html' %}
+
+{% block content %}
+<style>
+/* General Page Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fffaf0, #f8f8f8);
+    color: #333;
+}
+
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Heading */
+h2, h3 {
+    text-align: center;
+    color: #222;
+}
+
+/* Form Styling */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+select:focus {
+    border-color: #ffcc00;
+    outline: none;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.4);
+}
+
+button {
+    background: linear-gradient(to right, #ffcc00, #ffb700);
+    color: black;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to right, #ffb700, #ff9900);
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #ffcc00;
+    color: black;
+}
+
+td {
+    background-color: #fff;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<div class="container">
+    <h2>📊 Risk and Volatility Analysis</h2>
+
+    <!-- Scheme Selection Form -->
+    <form method="GET" action="{% url 'risk_volatility_analysis' %}">
+        <label for="scheme">Select a Scheme:</label>
+        <select name="scheme" id="scheme">
+            <option value="">-- Select Scheme --</option>
+            {% for scheme_code, scheme_name in scheme_names.items %}
+                <option value="{{ scheme_code }}" {% if scheme_code == selected_scheme_code %}selected{% endif %}>
+                    {{ scheme_name }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">Analyze</button>
+    </form>
+
+    {% if selected_scheme_name %}
+        <h3>📈 Metrics for: {{ selected_scheme_name }}</h3>
+    {% endif %}
+
+    <!-- Display Metrics -->
+    {% if metrics %}
+        <table>
+            <tr>
+                <th>Metric</th>
+                <th>Value</th>
+            </tr>
+            {% for metric, value in metrics.items %}
+                <tr>
+                    <td>{{ metric }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    {% if error %}
+        <p style="color: red; text-align: center;">⚠️ Error: {{ error }}</p>
+    {% endif %}
+</div>
+
+{% endblock %}

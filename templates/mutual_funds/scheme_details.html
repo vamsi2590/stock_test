@@ -1,0 +1,139 @@
+{% extends 'mutual_funds/base.html' %}
+
+{% block content %}
+<style>
+/* General Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fdfbfb, #ebedee);
+    color: #333;
+}
+
+/* Container */
+.container {
+    max-width: 700px;
+    margin: 50px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Heading */
+h1 {
+    text-align: center;
+    font-size: 26px;
+    color: #333;
+}
+
+/* Form Styling */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+}
+
+button {
+    background: linear-gradient(to right, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to right, #0056b3, #004085);
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: linear-gradient(to right, #007bff, #0056b3);
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+td {
+    background: #f9f9f9;
+    color: #333;
+}
+
+tr:nth-child(even) td {
+    background: #f1f1f1;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<div class="container">
+    <h1>📜 Scheme Details</h1>
+
+    <form method="get">
+        <label for="scheme">Select Scheme:</label>
+        <select name="scheme">
+            {% for scheme_name, scheme_code in scheme_names.items %}
+                <option value="{{ scheme_name }}" {% if selected_scheme == scheme_name %} selected {% endif %}>
+                    {{ scheme_name }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">Fetch Details</button>
+    </form>
+
+    {% if scheme_details %}
+        <h2>📊 Details for {{ selected_scheme }}</h2>
+        <table>
+            <tr><th>Attribute</th><th>Value</th></tr>
+            {% for key, value in scheme_details.items %}
+                <tr><td><strong>{{ key }}</strong></td><td>{{ value }}</td></tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No scheme details available. Please select a scheme.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

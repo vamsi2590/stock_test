@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 Lumpsum Investment Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: #0f172a;
+            color: #00ffcc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px #00ffcc;
+            width: 60%;
+        }
+        .slider-container {
+            margin: 15px 0;
+        }
+        input[type="range"] {
+            width: 80%;
+            accent-color: #00ffcc;
+        }
+        button {
+            background: transparent;
+            border: 2px solid #00ffcc;
+            padding: 12px 20px;
+            color: #00ffcc;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s ease-in-out;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background: #00ffcc;
+            color: #0f172a;
+            box-shadow: 0 0 15px #00ffcc;
+        }
+        .chart-container {
+            width: 90%;
+            max-width: 600px;
+            height: 300px;
+            margin: 20px auto;
+            padding: 15px;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            border-radius: 8px;
+            box-shadow: 0 0 15px #00ffcc;
+        }
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📈 Lumpsum Investment Calculator</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="slider-container">
+                <label>Investment Amount: ₹<span id="principal_display">{{ principal }}</span></label><br>
+                <input type="range" name="principal" min="10000" max="10000000" step="10000" value="{{ principal }}"
+                       oninput="updateValue('principal_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Annual Return Rate: <span id="rate_display">{{ rate_of_return }}</span>%</label><br>
+                <input type="range" name="rate_of_return" min="1" max="20" step="0.1" value="{{ rate_of_return }}"
+                       oninput="updateValue('rate_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Investment Duration: <span id="years_display">{{ years }}</span> years</label><br>
+                <input type="range" name="years" min="1" max="50" step="1" value="{{ years }}"
+                       oninput="updateValue('years_display', this.value)">
+            </div>
+
+            <button type="submit">📊 Calculate</button>
+        </form>
+
+        {% if future_value is not None %}
+            <h3>✅ Future Value: ₹<strong>{{ future_value }}</strong></h3>
+
+            <!-- Growth Chart -->
+            <div class="chart-container">
+                <canvas id="lumpsumChart"></canvas>
+            </div>
+
+            <script>
+                const ctx = document.getElementById("lumpsumChart").getContext("2d");
+                new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: {{ x_values|safe }},
+                        datasets: [{
+                            label: "Investment Growth Over Time",
+                            data: {{ y_values|safe }},
+                            borderColor: "#00ffcc",
+                            borderWidth: 2,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { title: { display: true, text: "Years" } },
+                            y: { title: { display: true, text: "Investment Value (₹)" }, beginAtZero: true }
+                        }
+                    }
+                });
+            </script>
+        {% endif %}
+    </div>
+</body>
+</html>

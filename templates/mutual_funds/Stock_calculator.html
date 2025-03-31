@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 Stock Profit & Loss Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: #0f172a;
+            color: #00ffcc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px #00ffcc;
+            width: 50%;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .slider-container {
+            margin: 8px 0;
+        }
+
+        input[type="range"] {
+            width: 90%;
+            accent-color: #00ffcc;
+        }
+
+        button {
+            background: transparent;
+            border: 2px solid #00ffcc;
+            padding: 8px 12px;
+            color: #00ffcc;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s ease-in-out;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #00ffcc;
+            color: #0f172a;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+
+        .chart-container {
+            width: 90%;
+            max-width: 600px;
+            height: 300px;
+            margin: 10px auto;
+            padding: 10px;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            border-radius: 8px;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📈 Stock Profit & Loss Calculator</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Buy Price -->
+            <div class="slider-container">
+                <label>Buy Price per Share: ₹<span id="buy_price_display">{{ buy_price }}</span></label><br>
+                <input type="range" name="buy_price" min="1" max="10000" step="1" value="{{ buy_price }}"
+                       oninput="updateValue('buy_price_display', this.value)">
+            </div>
+
+            <!-- Sell Price -->
+            <div class="slider-container">
+                <label>Sell Price per Share: ₹<span id="sell_price_display">{{ sell_price }}</span></label><br>
+                <input type="range" name="sell_price" min="1" max="10000" step="1" value="{{ sell_price }}"
+                       oninput="updateValue('sell_price_display', this.value)">
+            </div>
+
+            <!-- Number of Shares -->
+            <div class="slider-container">
+                <label>Number of Shares: <span id="shares_display">{{ shares }}</span></label><br>
+                <input type="range" name="shares" min="1" max="10000" step="1" value="{{ shares }}"
+                       oninput="updateValue('shares_display', this.value)">
+            </div>
+
+            <button type="submit">📊 Calculate Profit/Loss</button>
+        </form>
+
+        {% if result is not None %}
+            {% if result > 0 %}
+                <h3>✅ Profit: <strong>₹{{ result }}</strong></h3>
+            {% elif result < 0 %}
+                <h3>🔻 Loss: <strong>₹{{ abs_result }}</strong></h3>
+            {% else %}
+                <h3>⚖️ No Profit, No Loss</h3>
+            {% endif %}
+            <h4>📈 Percentage: <strong>{{ percentage }}%</strong></h4>
+
+            <!-- Profit/Loss Chart -->
+            <div class="chart-container">
+                <canvas id="profitLossChart"></canvas>
+            </div>
+
+            <script>
+                const data = {
+                    labels: ["Buy Price", "Sell Price"],
+                    datasets: [{
+                        label: "Stock Price",
+                        data: [{{ buy_price }}, {{ sell_price }}],
+                        backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(75, 192, 192, 0.6)'],
+                        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)'],
+                        borderWidth: 2
+                    }]
+                };
+
+                const ctx = document.getElementById('profitLossChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, title: { display: true, text: 'Stock Price (₹)' } } }
+                    }
+                });
+            </script>
+        {% endif %}
+    </div>
+</body>
+</html>

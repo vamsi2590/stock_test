@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 Retirement Planning Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: #0f172a;
+            color: #00ffcc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px #00ffcc;
+            width: 80%;
+            max-width: 800px;
+            margin: 0 auto;
+            overflow-y: auto;
+        }
+
+        .slider-container {
+            margin: 15px 0;
+        }
+
+        input[type="range"] {
+            width: 80%;
+            accent-color: #00ffcc;
+        }
+
+        button {
+            background: transparent;
+            border: 2px solid #00ffcc;
+            padding: 12px 20px;
+            color: #00ffcc;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s ease-in-out;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #00ffcc;
+            color: #0f172a;
+            box-shadow: 0 0 15px #00ffcc;
+        }
+
+        .chart-container {
+            width: 90%;
+            max-width: 700px;
+            height: 400px;
+            margin: 20px auto;
+            padding: 15px;
+            background: linear-gradient(135deg, #0d1b2a, #1b263b);
+            border-radius: 8px;
+            box-shadow: 0 0 15px #00ffcc;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📈 Retirement Planning Calculator</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="slider-container">
+                <label>Current Age: <span id="current_age_display">{{ current_age }}</span></label><br>
+                <input type="range" name="current_age" min="18" max="60" step="1" value="{{ current_age }}"
+                       oninput="updateValue('current_age_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Retirement Age: <span id="retirement_age_display">{{ retirement_age }}</span></label><br>
+                <input type="range" name="retirement_age" min="40" max="70" step="1" value="{{ retirement_age }}"
+                       oninput="updateValue('retirement_age_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Life Expectancy: <span id="life_expectancy_display">{{ life_expectancy }}</span></label><br>
+                <input type="range" name="life_expectancy" min="60" max="100" step="1" value="{{ life_expectancy }}"
+                       oninput="updateValue('life_expectancy_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Current Savings: ₹<span id="current_savings_display">{{ current_savings }}</span></label><br>
+                <input type="range" name="current_savings" min="0" max="50000000" step="100000" value="{{ current_savings }}"
+                       oninput="updateValue('current_savings_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Monthly Expenses (Post-Retirement): ₹<span id="monthly_expenses_display">{{ monthly_expenses }}</span></label><br>
+                <input type="range" name="monthly_expenses" min="5000" max="200000" step="1000" value="{{ monthly_expenses }}"
+                       oninput="updateValue('monthly_expenses_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Inflation Rate: <span id="inflation_rate_display">{{ inflation_rate }}</span>%</label><br>
+                <input type="range" name="inflation_rate" min="1" max="10" step="0.1" value="{{ inflation_rate }}"
+                       oninput="updateValue('inflation_rate_display', this.value)">
+            </div>
+
+            <div class="slider-container">
+                <label>Expected Returns on Investment: <span id="expected_returns_display">{{ expected_returns }}</span>%</label><br>
+                <input type="range" name="expected_returns" min="4" max="12" step="0.1" value="{{ expected_returns }}"
+                       oninput="updateValue('expected_returns_display', this.value)">
+            </div>
+
+            <button type="submit">📊 Calculate Retirement Plan</button>
+        </form>
+
+        {% if future_corpus is not None %}
+            <h3>✅ Required Retirement Corpus: ₹<strong>{{ future_corpus }}</strong></h3>
+
+            <div class="chart-container">
+                <canvas id="retirementChart"></canvas>
+            </div>
+
+            <script>
+                const labels = [...Array({{ expense_projection|length }}).keys()];
+                const savingsData = {{ savings_projection|safe }};
+                const expensesData = {{ expense_projection|safe }};
+
+                const ctx = document.getElementById('retirementChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Savings Growth',
+                                data: savingsData,
+                                borderColor: '#00ffcc',
+                                borderWidth: 2,
+                                fill: false
+                            },
+                            {
+                                label: 'Expected Expenses',
+                                data: expensesData,
+                                borderColor: 'red',
+                                borderWidth: 2,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { title: { display: true, text: 'Years' } },
+                            y: { title: { display: true, text: 'Value (₹)' }, beginAtZero: true }
+                        }
+                    }
+                });
+            </script>
+        {% endif %}
+    </div>
+</body>
+</html>

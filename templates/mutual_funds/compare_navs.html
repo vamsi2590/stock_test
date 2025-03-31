@@ -1,0 +1,36 @@
+{% if error %}
+    <p style="color: red;">{{ error }}</p>
+{% endif %}
+
+<h3>Compare NAVs</h3>
+
+<form method="get">
+    <label>Select Schemes:</label>
+    <select name="schemes" multiple>
+        {% for scheme_name, scheme_code in scheme_names.items %}
+            <option value="{{ scheme_name }}" {% if scheme_name in selected_schemes %}selected{% endif %}>
+                {{ scheme_name }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Compare</button>
+</form>
+
+{% if chart_json %}
+    <h3>Comparison of NAVs</h3>
+    <div id="chart"></div>
+
+    <!-- Debugging: Shows JSON output -->
+    <pre>{{ chart_json }}</pre>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        try {
+            var graphData = JSON.parse('{{ chart_json|escapejs }}');
+            console.log("🔍 Chart Data:", graphData);
+            Plotly.newPlot('chart', graphData.data, graphData.layout);
+        } catch (e) {
+            console.error("❌ Plotly Error:", e);
+        }
+    </script>
+{% endif %}

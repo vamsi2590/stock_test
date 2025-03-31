@@ -1,0 +1,111 @@
+<style>
+/* Full-page background with a soft yellow gradient */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fff8dc, #fffff0);
+}
+
+/* Centered Dashboard Container */
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 500px;
+    backdrop-filter: blur(5px);
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Smooth fade-in effect */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Heading */
+h2 {
+    color: #222222;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Subtext */
+p {
+    color: #444444;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Navigation menu */
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Navigation links */
+nav ul li {
+    display: block;
+    width: 100%;
+}
+
+nav ul li a {
+    display: block;
+    text-decoration: none;
+    background: linear-gradient(to right, #ffd700, #ffecb3);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #000000;
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+    box-shadow: 0px 5px 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Button Hover Effect */
+nav ul li a:hover {
+    background: linear-gradient(to right, #ffecb3, #ffd700);
+    transform: scale(1.05);
+}
+
+/* Logout Button */
+nav ul li:last-child a {
+    background: linear-gradient(to right, #ff6b6b, #ff4757);
+    box-shadow: 0px 5px 10px rgba(255, 107, 107, 0.3);
+    color: white;
+}
+
+nav ul li:last-child a:hover {
+    background: linear-gradient(to right, #ff4757, #ff6b6b);
+    transform: scale(1.05);
+}
+</style>
+
+<div class="container">
+    <h2>Welcome to the Mutual Fund Dashboard</h2>
+    <p>Analyze, compare, and track mutual funds in real-time.</p>
+
+    <nav>
+        <ul>
+            <li><a href="{% url 'calculators_list' %}">📊 Go to Calculators</a></li>
+            <li><a href="{% url 'dashboard' %}">📊 Dashboard</a></li>
+            <li><a href="{% url 'scheme_details' %}">📄 Scheme Details</a></li>
+            <li><a href="{% url 'historical_nav' %}">📈 Historical NAV</a></li>
+            <li><a href="{% url 'compare_navs' %}">🔍 Compare NAVs</a></li>
+            <li><a href="{% url 'risk_volatility_analysis' %}">⚖ Risk & Volatility Analysis</a></li>
+            <li><a href="{% url 'average_aum' %}">💰 Average AUM</a></li>
+            <li><a href="{% url 'performance_heatmap' %}">🔥 Performance Heatmap</a></li>
+            <li><a href="{% url 'logout' %}">🚪 Logout</a></li>
+        </ul>
+    </nav>
+</div>
